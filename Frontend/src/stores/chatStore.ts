@@ -26,7 +26,7 @@ interface ChatState {
   fetchChats: () => Promise<void>;
   setActiveChat: (chat: Chat | null) => void;
   fetchMessages: (chatId: string) => Promise<void>;
-  sendMessage: (chatId: string, content: string, type?: Message['type'], replyToId?: string) => Promise<void>;
+  sendMessage: (chatId: string, content: string, currentUser: User, type?: Message['type'], replyToId?: string) => Promise<void>;
   sendAttachment: (chatId: string, files: File[]) => Promise<void>;
   editMessage: (chatId: string, messageId: string, newContent: string) => Promise<void>;
   deleteMessage: (chatId: string, messageId: string) => Promise<void>;
@@ -114,10 +114,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }
   },
 
-  sendMessage: async (chatId, content, type = 'text', replyToId) => {
+  sendMessage: async (chatId, content, currentUser, type = 'text', replyToId) => {
     try {
       // Optimistic update
-      const { user } = await import('@/stores/authStore').then(m => m.useAuthStore.getState());
+      const user = currentUser;
       if (!user) throw new Error('User not authenticated');
 
       let replyToMessage;

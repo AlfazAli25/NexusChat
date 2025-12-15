@@ -47,7 +47,8 @@ export function ChatWindow({ chat, onBack }: ChatWindowProps) {
   ]);
 
   const handleSendMessage = (content: string) => {
-    sendMessage(chat.id, content, 'text', replyingTo?.id || replyingTo?._id);
+    if (!user) return;
+    sendMessage(chat.id, content, user, 'text', replyingTo?.id || replyingTo?._id);
     setReplyingTo(null);
     scrollToBottom();
   };
