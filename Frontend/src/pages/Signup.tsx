@@ -23,7 +23,7 @@ export default function Signup() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/chat');
+      navigate('/chats');
       return;
     }
 
@@ -72,7 +72,7 @@ export default function Signup() {
         title: 'Account created!',
         description: 'Welcome to NexusChat',
       });
-      navigate('/chat');
+      navigate('/chats');
     } catch (error) {
       toast({
         title: 'Error',

@@ -14,36 +14,36 @@ export default function Landing() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/chat');
+      navigate('/chats');
       return;
     }
 
     // GSAP animations
     const tl = gsap.timeline();
-    
+
     tl.fromTo(
       '.hero-title',
       { opacity: 0, y: 50 },
       { opacity: 1, y: 0, duration: 1, ease: 'power3.out' }
     )
-    .fromTo(
-      '.hero-subtitle',
-      { opacity: 0, y: 30 },
-      { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' },
-      '-=0.5'
-    )
-    .fromTo(
-      '.hero-buttons',
-      { opacity: 0, y: 20 },
-      { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' },
-      '-=0.3'
-    )
-    .fromTo(
-      '.feature-card',
-      { opacity: 0, y: 40, scale: 0.95 },
-      { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.15, ease: 'power3.out' },
-      '-=0.2'
-    );
+      .fromTo(
+        '.hero-subtitle',
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' },
+        '-=0.5'
+      )
+      .fromTo(
+        '.hero-buttons',
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' },
+        '-=0.3'
+      )
+      .fromTo(
+        '.feature-card',
+        { opacity: 0, y: 40, scale: 0.95 },
+        { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.15, ease: 'power3.out' },
+        '-=0.2'
+      );
   }, [isAuthenticated, navigate]);
 
   const features = [

@@ -21,7 +21,7 @@ export default function Login() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/chat');
+      navigate('/chats');
       return;
     }
 
@@ -53,7 +53,7 @@ export default function Login() {
         title: 'Welcome back!',
         description: 'Successfully logged in',
       });
-      navigate('/chat');
+      navigate('/chats');
     } catch (error) {
       toast({
         title: 'Error',
