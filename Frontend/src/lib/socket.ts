@@ -72,6 +72,9 @@ export const disconnectSocket = (): void => {
 
 // Get socket instance
 export const getSocket = (): Socket | null => {
+  if (!socket && getToken()) {
+    return connectSocket();
+  }
   return socket;
 };
 

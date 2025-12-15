@@ -30,15 +30,15 @@ export const useAuthStore = create<AuthState>()(
         try {
           const response = await authApi.login(email, password);
 
+          // Connect to socket before updating state to ensure listeners can attach
+          connectSocket();
+
           set({
             user: response.user,
             token: response.token,
             isAuthenticated: true,
             isLoading: false,
           });
-
-          // Connect to socket after login
-          connectSocket();
         } catch (error) {
           set({ isLoading: false });
           throw error;
@@ -50,15 +50,15 @@ export const useAuthStore = create<AuthState>()(
         try {
           const response = await authApi.signup(name, email, password);
 
+          // Connect to socket before updating state
+          connectSocket();
+
           set({
             user: response.user,
             token: response.token,
             isAuthenticated: true,
             isLoading: false,
           });
-
-          // Connect to socket after signup
-          connectSocket();
         } catch (error) {
           set({ isLoading: false });
           throw error;
@@ -108,13 +108,13 @@ export const useAuthStore = create<AuthState>()(
 
         try {
           const response = await authApi.getMe();
+          // Connect socket first
+          connectSocket();
+
           set({
             user: response.user,
             isAuthenticated: true,
           });
-
-          // Connect socket if authenticated
-          connectSocket();
         } catch (error) {
           // Token invalid, clear auth
           set({
