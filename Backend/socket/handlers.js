@@ -114,17 +114,25 @@ export const initializeSocket = (io) => {
           await message.populate('replyTo', 'content sender type');
         }
 
-        // Broadcast to all participants in the chat
-        io.to(`chat:${chatId}`).emit('new-message', {
-          chatId,
-          message: message.toObject(),
-        });
+        // Get participants to broadcast to their personal rooms
+        // This ensures they get the message even if they haven't joined the chat room yet (e.g. new chat)
+        await chat.populate('participants', '_id');
 
-        // Update last message for chat list
-        io.to(`chat:${chatId}`).emit('chat-updated', {
-          chatId,
-          lastMessage: message.toObject(),
-          updatedAt: chat.updatedAt,
+        chat.participants.forEach((participant) => {
+          const participantId = participant._id.toString();
+          
+          // Emit new message
+          io.to(`user:${participantId}`).emit('new-message', {
+            chatId,
+            message: message.toObject(),
+          });
+
+          // Update chat list
+          io.to(`user:${participantId}`).emit('chat-updated', {
+            chatId,
+            lastMessage: message.toObject(),
+            updatedAt: chat.updatedAt,
+          });
         });
 
       } catch (error) {

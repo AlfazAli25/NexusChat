@@ -362,6 +362,15 @@ export const useChatStore = create<ChatState>((set, get) => ({
     const { chatId, message } = data;
 
     set((state) => {
+      // Check if we have this chat in our list
+      const chatExists = state.chats.some(c => (c.id || c._id) === chatId);
+
+      // If it's a new chat we don't know about, fetch chats to get it and join room
+      if (!chatExists) {
+        get().fetchChats();
+        return {}; // We'll get the message when chats are fetched (or next update)
+      }
+
       const currentMessages = state.messages[chatId] || [];
 
       // Check if we have a temporary message that matches this one (optimistic update)
