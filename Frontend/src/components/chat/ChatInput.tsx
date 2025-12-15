@@ -109,7 +109,7 @@ export function ChatInput({
         </div>
       )}
 
-      <div className="px-4 py-3 pb-4 flex items-end gap-2">
+      <div className="px-2 py-3 pb-4 flex items-end gap-2">
         {/* Plus / Attach */}
         <Button
           variant="ghost"
