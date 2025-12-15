@@ -9,7 +9,7 @@ interface HelpDialogProps {
 
 export function HelpDialog({ open, onOpenChange }: HelpDialogProps) {
   const handleEmailSupport = () => {
-    window.location.href = 'mailto:support@nexuschat.com';
+    window.location.href = 'mailto:alfazali499@gmail.com';
   };
 
   const handleHelpCenter = () => {
@@ -19,7 +19,7 @@ export function HelpDialog({ open, onOpenChange }: HelpDialogProps) {
   const handleContactSupport = () => {
     // In a real app, this might open a chat window or a form
     // For now, we'll redirect to email as well
-    window.location.href = 'mailto:support@nexuschat.com?subject=Support%20Request';
+    window.location.href = 'mailto:alfazali499@gmail.com?subject=Support%20Request';
   };
 
   return (
@@ -48,7 +48,7 @@ export function HelpDialog({ open, onOpenChange }: HelpDialogProps) {
             </div>
             <div className="flex flex-col items-start gap-1">
               <span className="font-semibold">Email Us</span>
-              <span className="text-xs text-muted-foreground">support@nexuschat.com</span>
+              <span className="text-xs text-muted-foreground">alfazali499@gmail.com</span>
             </div>
           </Button>
 
@@ -57,7 +57,7 @@ export function HelpDialog({ open, onOpenChange }: HelpDialogProps) {
           </Button>
         </div>
         <DialogFooter className="text-xs text-center text-muted-foreground">
-          NexusChat v1.0.0 • support@nexuschat.com
+          NexusChat v1.0.0 • alfazali499@gmail.com
         </DialogFooter>
       </DialogContent>
     </Dialog>
