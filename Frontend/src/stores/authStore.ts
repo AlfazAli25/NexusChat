@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { authApi, User } from '@/lib/api';
 import { connectSocket, disconnectSocket } from '@/lib/socket';
-import { useChatStore } from './chatStore';
+
 
 interface AuthState {
   user: User | null;
@@ -76,7 +76,9 @@ export const useAuthStore = create<AuthState>()(
           disconnectSocket();
 
           // Reset chat store
-          useChatStore.getState().reset();
+          import('./chatStore').then(({ useChatStore }) => {
+            useChatStore.getState().reset();
+          });
 
           // Clear state
           set({
