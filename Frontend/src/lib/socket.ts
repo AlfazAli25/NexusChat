@@ -28,7 +28,11 @@ export const connectSocket = (): Socket | null => {
     return null;
   }
 
-  if (socket?.connected) {
+  if (socket) {
+    if (!socket.connected) {
+      socket.auth = { token };
+      socket.connect();
+    }
     return socket;
   }
 
