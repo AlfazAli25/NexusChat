@@ -2,6 +2,7 @@ import { useRef, useEffect, useState } from 'react';
 import { Search, ArrowLeft, X } from 'lucide-react';
 import { Chat, useChatStore } from '@/stores/chatStore';
 import { useAuthStore } from '@/stores/authStore';
+import { useSettingsStore } from '@/stores/themeStore';
 import { useScrollToBottom } from '@/hooks/useScrollToBottom';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -14,8 +15,21 @@ interface ChatWindowProps {
   onBack?: () => void;
 }
 
+// Helper to map theme names to hue rotations
+const getHueRotation = (theme: string) => {
+  switch (theme) {
+    case 'blue': return 0; // Default mesh is blue-ish
+    case 'purple': return 270;
+    case 'green': return 90;
+    case 'orange': return 180;
+    case 'pink': return 300;
+    default: return 0;
+  }
+};
+
 export function ChatWindow({ chat, onBack }: ChatWindowProps) {
   const { user } = useAuthStore();
+  const { chatTheme } = useSettingsStore();
   const {
     messages,
     sendMessage,
@@ -130,7 +144,12 @@ export function ChatWindow({ chat, onBack }: ChatWindowProps) {
       {/* Messages Area - Mesh Background */}
       <div className="flex-1 relative overflow-hidden bg-background/50">
         {/* Mesh Gradient Background Layer */}
-        <div className="absolute inset-0 mesh-bg opacity-30 pointer-events-none"></div>
+        <div
+          className="absolute inset-0 mesh-bg opacity-30 pointer-events-none"
+          style={{
+            filter: chatTheme !== 'default' ? `hue-rotate(${getHueRotation(chatTheme)}deg)` : 'none'
+          }}
+        ></div>
 
         <div
           ref={containerRef}

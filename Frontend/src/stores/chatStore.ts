@@ -370,6 +370,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
         if (chat) {
           // Optimization: Add chat directly to avoid fetch delay
           const newChat = { ...chat, lastMessage: message, unreadCount: 1 };
+
+          // Join socket room for this new chat to receive real-time updates (typing, etc.)
+          socketEmit.joinChat(newChat.id || newChat._id!);
+
           return {
             chats: [newChat, ...state.chats],
             messages: {
