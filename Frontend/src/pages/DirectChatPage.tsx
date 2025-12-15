@@ -107,7 +107,7 @@ export default function DirectChatPage() {
         <div className="flex-1 flex flex-col h-full w-full relative overflow-hidden bg-background/30 backdrop-blur-sm">
           {/* Centered Chat Window Wrapper */}
           <div className="flex h-full w-full justify-center">
-            <div className="flex-1 flex flex-col h-11/12 w-full max-w-5xl bg-background shadow-2xl overflow-hidden md:my-4 md:rounded-2xl border border-border/50 relative">
+            <div className="flex-1 flex flex-col h-full md:h-[95%] w-full max-w-5xl bg-background shadow-2xl overflow-hidden md:my-4 md:rounded-2xl border border-border/50 relative">
               {activeChat ? (
                 <ChatWindow chat={activeChat} onBack={handleBack} />
               ) : (

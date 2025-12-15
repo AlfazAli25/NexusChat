@@ -120,16 +120,7 @@ function SidebarContent({
             {collapsed ? <Menu className="h-5 w-5" /> : <X className="h-5 w-5" />}
           </Button>
         )}
-        {isMobile && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onNavigate}
-            className="shrink-0"
-          >
-            <X className="h-5 w-5" />
-          </Button>
-        )}
+
       </div>
 
       {/* User profile */}
