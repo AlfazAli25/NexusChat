@@ -358,17 +358,29 @@ export const useChatStore = create<ChatState>((set, get) => ({
   },
 
   // Socket event handlers
-  handleNewMessage: (data) => {
-    const { chatId, message } = data;
+  handleNewMessage: (data: { chatId: string; message: Message; chat?: Chat }) => {
+    const { chatId, message, chat } = data;
 
     set((state) => {
       // Check if we have this chat in our list
       const chatExists = state.chats.some(c => (c.id || c._id) === chatId);
 
-      // If it's a new chat we don't know about, fetch chats to get it and join room
+      // If it's a new chat we don't know about
       if (!chatExists) {
-        get().fetchChats();
-        return {}; // We'll get the message when chats are fetched (or next update)
+        if (chat) {
+          // Optimization: Add chat directly to avoid fetch delay
+          const newChat = { ...chat, lastMessage: message, unreadCount: 1 };
+          return {
+            chats: [newChat, ...state.chats],
+            messages: {
+              ...state.messages,
+              [chatId]: [message]
+            }
+          };
+        } else {
+          get().fetchChats();
+          return {};
+        }
       }
 
       const currentMessages = state.messages[chatId] || [];

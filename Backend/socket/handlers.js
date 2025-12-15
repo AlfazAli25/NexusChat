@@ -115,19 +115,20 @@ export const initializeSocket = (io) => {
         }
 
         // Get participants to broadcast to their personal rooms
-        // This ensures they get the message even if they haven't joined the chat room yet (e.g. new chat)
-        await chat.populate('participants', '_id');
+        // We populate more fields now so the frontend can create the chat entry immediately
+        await chat.populate('participants', 'name avatar status email');
 
         chat.participants.forEach((participant) => {
           const participantId = participant._id.toString();
           
-          // Emit new message
+          // Emit new message WITH chat data
           io.to(`user:${participantId}`).emit('new-message', {
             chatId,
             message: message.toObject(),
+            chat: chat.toObject(), // Send full chat object
           });
 
-          // Update chat list
+          // Update chat list (redundant if new-message is handled, but good for other listeners)
           io.to(`user:${participantId}`).emit('chat-updated', {
             chatId,
             lastMessage: message.toObject(),
