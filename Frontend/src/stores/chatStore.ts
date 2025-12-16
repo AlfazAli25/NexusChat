@@ -362,66 +362,59 @@ export const useChatStore = create<ChatState>((set, get) => ({
     const { chatId, message, chat } = data;
 
     set((state) => {
-      // Check if we have this chat in our list
-      const chatExists = state.chats.some(c => (c.id || c._id) === chatId);
+      // Robust check for chat existence using both ID forms
+      const chatIndex = state.chats.findIndex(c =>
+        (c.id === chatId) || (c._id === chatId) ||
+        (chatId && (c.id === chatId || c._id === chatId))
+      );
 
-      // If it's a new chat we don't know about
+      const chatExists = chatIndex > -1;
+      let newChats = [...state.chats];
+
+      // If it's a new chat we don't know about, or if we need to add it
       if (!chatExists) {
         if (chat) {
-          // Optimization: Add chat directly to avoid fetch delay
+          // Add chat directly
           const newChat = { ...chat, lastMessage: message, unreadCount: 1 };
-
-          // Join socket room for this new chat to receive real-time updates (typing, etc.)
+          // Ensure we join room just in case
           socketEmit.joinChat(newChat.id || newChat._id!);
-
-          return {
-            chats: [newChat, ...state.chats],
-            messages: {
-              ...state.messages,
-              [chatId]: [message]
-            }
-          };
+          newChats = [newChat, ...state.chats];
         } else {
+          // If we don't have chat data, fetch it, BUT still store the message!
           get().fetchChats();
-          return {};
+          // We can't add to chat list easily without data, but we CAN update message store
+          // so if user is on that page (by URL), they see it.
+        }
+      } else {
+        // Update existing chat's last message and unread count
+        const existingChat = newChats[chatIndex];
+        const isActive = state.activeChat && (state.activeChat.id === existingChat.id || state.activeChat._id === existingChat._id);
+
+        newChats[chatIndex] = {
+          ...existingChat,
+          lastMessage: message,
+          unreadCount: isActive ? 0 : (existingChat.unreadCount || 0) + 1,
         }
       }
 
+      // Always update message store for this chatId
       const currentMessages = state.messages[chatId] || [];
 
-      // Check if we have a temporary message that matches this one (optimistic update)
-      // We look for a temp message with the same content and sender from the current user
+      // Deduplication logic
       const filteredMessages = currentMessages.filter(msg => {
         const isTemp = (msg.id || msg._id || '').startsWith('temp-');
         const isSameContent = msg.content === message.content;
-        // Basic deduplication - if it looks like the same message but temp, remove it
-        if (isTemp && isSameContent && msg.sender.id === message.sender.id) {
-          return false;
-        }
-        // Also avoid strict duplicates by ID if socket sends it twice
-        if ((msg.id || msg._id) === (message.id || message._id)) {
-          return false;
-        }
+        if (isTemp && isSameContent && msg.sender.id === message.sender.id) return false;
+        if ((msg.id || msg._id) === (message.id || message._id)) return false;
         return true;
       });
 
       return {
+        chats: newChats,
         messages: {
           ...state.messages,
           [chatId]: [...filteredMessages, message],
         },
-        chats: state.chats.map((chat) =>
-          (chat.id || chat._id) === chatId
-            ? {
-              ...chat,
-              lastMessage: message,
-              unreadCount:
-                state.activeChat && (state.activeChat.id || state.activeChat._id) === chatId
-                  ? 0
-                  : chat.unreadCount + 1,
-            }
-            : chat
-        ),
       };
     });
   },
