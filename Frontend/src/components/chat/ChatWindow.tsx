@@ -43,8 +43,8 @@ export function ChatWindow({ chat, onBack }: ChatWindowProps) {
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const chatMessages = messages[chat.id] || [];
-  const isTyping = typingUsers[chat.id]?.length > 0;
+  const chatMessages = messages[chat.id || chat._id!] || [];
+  const isTyping = typingUsers[chat.id || chat._id!]?.length > 0;
 
   const filteredMessages = chatMessages.filter(msg =>
     msg.content.toLowerCase().includes(searchQuery.toLowerCase())
@@ -62,23 +62,23 @@ export function ChatWindow({ chat, onBack }: ChatWindowProps) {
 
   const handleSendMessage = (content: string) => {
     if (!user) return;
-    sendMessage(chat.id, content, user, 'text', replyingTo?.id || replyingTo?._id);
+    sendMessage(chat.id || chat._id!, content, user, 'text', replyingTo?.id || replyingTo?._id);
     setReplyingTo(null);
     scrollToBottom();
   };
 
   const handleSendAttachment = async (files: File[]) => {
-    await sendAttachment(chat.id, files);
+    await sendAttachment(chat.id || chat._id!, files);
     scrollToBottom();
   };
 
   const handleDeleteMessage = (messageId: string) => {
-    deleteMessage(chat.id, messageId);
+    deleteMessage(chat.id || chat._id!, messageId);
   };
 
   const handleReaction = (messageId: string, emoji: string) => {
     if (!user) return;
-    addReaction(chat.id, messageId, emoji, user.id || user._id!);
+    addReaction(chat.id || chat._id!, messageId, emoji, user.id || user._id!);
   };
 
   return (
