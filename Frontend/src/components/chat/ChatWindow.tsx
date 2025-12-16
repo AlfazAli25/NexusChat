@@ -43,8 +43,14 @@ export function ChatWindow({ chat, onBack }: ChatWindowProps) {
   const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const chatMessages = messages[chat.id || chat._id!] || [];
-  const isTyping = typingUsers[chat.id || chat._id!]?.length > 0;
+  // Try both ID forms to find messages
+  const messagesById = chat.id ? messages[chat.id] : undefined;
+  const messagesByUnderId = chat._id ? messages[chat._id] : undefined;
+  const chatMessages = messagesById || messagesByUnderId || [];
+
+  // Determine which ID to use for actions (consistent with what we found messages for, or fallback)
+  const activeId = (messagesById ? chat.id : (chat._id || chat.id))!;
+  const isTyping = typingUsers[activeId]?.length > 0;
 
   const filteredMessages = chatMessages.filter(msg =>
     msg.content.toLowerCase().includes(searchQuery.toLowerCase())
@@ -62,23 +68,23 @@ export function ChatWindow({ chat, onBack }: ChatWindowProps) {
 
   const handleSendMessage = (content: string) => {
     if (!user) return;
-    sendMessage(chat.id || chat._id!, content, user, 'text', replyingTo?.id || replyingTo?._id);
+    sendMessage(activeId, content, user, 'text', replyingTo?.id || replyingTo?._id);
     setReplyingTo(null);
     scrollToBottom();
   };
 
   const handleSendAttachment = async (files: File[]) => {
-    await sendAttachment(chat.id || chat._id!, files);
+    await sendAttachment(activeId, files);
     scrollToBottom();
   };
 
   const handleDeleteMessage = (messageId: string) => {
-    deleteMessage(chat.id || chat._id!, messageId);
+    deleteMessage(activeId, messageId);
   };
 
   const handleReaction = (messageId: string, emoji: string) => {
     if (!user) return;
-    addReaction(chat.id || chat._id!, messageId, emoji, user.id || user._id!);
+    addReaction(activeId, messageId, emoji, user.id || user._id!);
   };
 
   return (
