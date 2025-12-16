@@ -14,6 +14,7 @@ router.post(
   '/',
   protect,
   asyncHandler(async (req, res) => {
+    const socketHelpers = req.app.get('socketHelpers'); // Get socket helpers
     const { chatId, content, type = 'text', replyTo } = req.body;
 
     if (!chatId) {
@@ -120,6 +121,28 @@ router.post(
 
     await message.populate('sender', 'name avatar status');
 
+    // Socket: Broadcast new message with attachment
+    const socketHelpers = req.app.get('socketHelpers');
+    if (socketHelpers) {
+      await chat.populate('participants', 'name avatar status email');
+      
+      chat.participants.forEach((participant) => {
+        const participantId = participant._id.toString();
+        
+        socketHelpers.emitToUser(participantId, 'new-message', {
+          chatId,
+          message: message.toObject(),
+          chat: chat.toObject(),
+        });
+
+        socketHelpers.emitToUser(participantId, 'chat-updated', {
+          chatId,
+          lastMessage: message.toObject(),
+          updatedAt: chat.updatedAt,
+        });
+      });
+    }
+
     res.status(201).json({
       success: true,
       message,
@@ -161,6 +184,15 @@ router.put(
     await message.save();
 
     await message.populate('sender', 'name avatar status');
+
+    // Socket: Broadcast message edited
+    const socketHelpers = req.app.get('socketHelpers');
+    if (socketHelpers) {
+      socketHelpers.emitToChat(message.chat, 'message-edited', {
+        chatId: message.chat,
+        message: message.toObject(),
+      });
+    }
 
     res.json({
       success: true,
@@ -209,6 +241,15 @@ router.delete(
     message.content = 'This message was deleted';
     message.attachments = [];
     await message.save();
+
+    // Socket: Broadcast message deleted
+    const socketHelpers = req.app.get('socketHelpers');
+    if (socketHelpers) {
+      socketHelpers.emitToChat(message.chat, 'message-deleted', {
+        chatId: message.chat,
+        messageId: req.params.id,
+      });
+    }
 
     res.json({
       success: true,
@@ -341,6 +382,19 @@ router.post(
         $set: { status: 'seen' },
       }
     );
+
+    // Socket: Broadcast messages read
+    const socketHelpers = req.app.get('socketHelpers');
+    if (socketHelpers) {
+      socketHelpers.emitToChat(req.params.chatId, 'messages-read', {
+        chatId: req.params.chatId,
+        readBy: req.user._id,
+        // we generally don't send all IDs for read-all, or we send a flag
+        // mimicking the socket handler structure:
+        messageIds: [], // Empty indicates all? Or we can rely on frontend interpretation
+        allRead: true
+      });
+    }
 
     res.json({
       success: true,

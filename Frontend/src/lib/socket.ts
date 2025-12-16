@@ -20,24 +20,24 @@ const getToken = (): string | null => {
 };
 
 // Connect to socket server
-export const connectSocket = (): Socket | null => {
-  const token = getToken();
+export const connectSocket = (token?: string | null): Socket | null => {
+  const authToken = token || getToken();
 
-  if (!token) {
+  if (!authToken) {
     console.warn('No token found, cannot connect to socket');
     return null;
   }
 
   if (socket) {
     if (!socket.connected) {
-      socket.auth = { token };
+      socket.auth = { token: authToken };
       socket.connect();
     }
     return socket;
   }
 
   socket = io(SOCKET_URL, {
-    auth: { token },
+    auth: { token: authToken },
     transports: ['websocket', 'polling'],
     reconnection: true,
     reconnectionAttempts: 5,

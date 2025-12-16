@@ -31,7 +31,7 @@ export const useAuthStore = create<AuthState>()(
           const response = await authApi.login(email, password);
 
           // Connect to socket before updating state to ensure listeners can attach
-          connectSocket();
+          connectSocket(response.token);
 
           set({
             user: response.user,
@@ -51,7 +51,7 @@ export const useAuthStore = create<AuthState>()(
           const response = await authApi.signup(name, email, password);
 
           // Connect to socket before updating state
-          connectSocket();
+          connectSocket(response.token);
 
           set({
             user: response.user,
@@ -109,7 +109,7 @@ export const useAuthStore = create<AuthState>()(
         try {
           const response = await authApi.getMe();
           // Connect socket first
-          connectSocket();
+          connectSocket(token);
 
           set({
             user: response.user,
