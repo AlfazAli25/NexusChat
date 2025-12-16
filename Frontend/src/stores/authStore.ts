@@ -8,6 +8,7 @@ interface AuthState {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
+  socketConnected: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
   signup: (name: string, email: string, password: string) => Promise<void>;
@@ -23,6 +24,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       token: null,
       isAuthenticated: false,
+      socketConnected: false,
       isLoading: false,
 
       login: async (email: string, password: string) => {
@@ -37,6 +39,7 @@ export const useAuthStore = create<AuthState>()(
             user: response.user,
             token: response.token,
             isAuthenticated: true,
+            socketConnected: true,
             isLoading: false,
           });
         } catch (error) {
@@ -57,6 +60,7 @@ export const useAuthStore = create<AuthState>()(
             user: response.user,
             token: response.token,
             isAuthenticated: true,
+            socketConnected: true,
             isLoading: false,
           });
         } catch (error) {
@@ -85,6 +89,7 @@ export const useAuthStore = create<AuthState>()(
             user: null,
             token: null,
             isAuthenticated: false,
+            socketConnected: false,
           });
         }
       },
@@ -114,6 +119,7 @@ export const useAuthStore = create<AuthState>()(
           set({
             user: response.user,
             isAuthenticated: true,
+            socketConnected: true,
           });
         } catch (error) {
           // Token invalid, clear auth
@@ -121,6 +127,7 @@ export const useAuthStore = create<AuthState>()(
             user: null,
             token: null,
             isAuthenticated: false,
+            socketConnected: false,
           });
           disconnectSocket();
         }
@@ -132,6 +139,7 @@ export const useAuthStore = create<AuthState>()(
         user: state.user,
         token: state.token,
         isAuthenticated: state.isAuthenticated,
+        // Don't persist socketConnected, strictly runtime state
       }),
     }
   )

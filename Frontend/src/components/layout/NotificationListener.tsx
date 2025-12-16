@@ -20,14 +20,14 @@ export function NotificationListener() {
     audioRef.current = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3'); // Fallback URL or local asset
   }, []);
 
-  // Initialize store socket listeners
   useEffect(() => {
-    if (!isAuthenticated) return; // Added isAuthenticated check
+    // Only initialize listeners when fully authenticated AND socket is actually connected
+    if (!isAuthenticated || !useAuthStore.getState().socketConnected) return;
 
     const { initSocketListeners } = useChatStore.getState();
     const cleanup = initSocketListeners();
     return cleanup;
-  }, [isAuthenticated]); // Added isAuthenticated to dependency array
+  }, [isAuthenticated, useAuthStore.getState().socketConnected]);
 
   useEffect(() => {
     if (!notifications) return;
