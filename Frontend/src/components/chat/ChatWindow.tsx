@@ -46,6 +46,8 @@ export function ChatWindow({ chat, onBack }: ChatWindowProps) {
   // Try both ID forms to find messages
   const messagesById = chat.id ? messages[chat.id] : undefined;
   const messagesByUnderId = chat._id ? messages[chat._id] : undefined;
+  console.log('[ChatWindow] Rendering for chat:', { id: chat.id, _id: chat._id });
+  console.log('[ChatWindow] Messages found:', { byId: messagesById?.length, byUnderId: messagesByUnderId?.length });
   const chatMessages = messagesById || messagesByUnderId || [];
 
   // Determine which ID to use for actions (consistent with what we found messages for, or fallback)

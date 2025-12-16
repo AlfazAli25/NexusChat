@@ -359,9 +359,11 @@ export const useChatStore = create<ChatState>((set, get) => ({
 
   // Socket event handlers
   handleNewMessage: (data: { chatId: string; message: Message; chat?: Chat }) => {
+    console.log('[Store] handleNewMessage received:', data);
     const { chatId, message, chat } = data;
 
     set((state) => {
+      console.log('[Store] Processing for chat:', chatId);
       // Robust check for chat existence using both ID forms
       const chatIndex = state.chats.findIndex(c =>
         (c.id === chatId) || (c._id === chatId) ||
