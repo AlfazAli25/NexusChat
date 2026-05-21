@@ -33,6 +33,8 @@ const vercelOrigin = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : null;
 
+const normalizeOrigin = (origin) => (origin ? origin.replace(/\/$/, '') : origin);
+
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:8080',
@@ -42,9 +44,21 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
   process.env.VITE_CLIENT_URL,
   vercelOrigin,
-].filter(Boolean);
+]
+  .filter(Boolean)
+  .map(normalizeOrigin);
 
-const isAllowedOrigin = (origin) => !origin || allowedOrigins.includes(origin);
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+  const normalized = normalizeOrigin(origin);
+  if (allowedOrigins.includes(normalized)) return true;
+  try {
+    const { hostname } = new URL(normalized);
+    return hostname.endsWith('.vercel.app');
+  } catch {
+    return false;
+  }
+};
 
 const io = new Server(httpServer, {
   cors: {
